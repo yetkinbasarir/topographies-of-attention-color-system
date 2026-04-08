@@ -2,9 +2,10 @@
   "meta": {
     "name": "Topographies of Attention Color System",
     "shortName": "t-of-a",
-    "version": "v1",
+    "version": "v2",
     "sourceOfTruth": "tokens/topographies-of-attention-color-system.json",
-    "referenceHTML": "reference/t-of-a-day-night-system-v11.html"
+    "referenceHTML": "reference/t-of-a-day-night-system-v11.html",
+    "themeCodeCount": 26
   },
   "principles": {
     "colorsNeverChangeBetweenDayAndNight": true,
@@ -41,6 +42,34 @@
       "attention": "attention"
     }
   },
+  "themeCodes": [
+    "shellDay",
+    "shellNight",
+    "januaryDay",
+    "februaryDay",
+    "marchDay",
+    "aprilDay",
+    "mayDay",
+    "juneDay",
+    "julyDay",
+    "augustDay",
+    "septemberDay",
+    "octoberDay",
+    "novemberDay",
+    "decemberDay",
+    "januaryNight",
+    "februaryNight",
+    "marchNight",
+    "aprilNight",
+    "mayNight",
+    "juneNight",
+    "julyNight",
+    "augustNight",
+    "septemberNight",
+    "octoberNight",
+    "novemberNight",
+    "decemberNight"
+  ],
   "months": {
     "january": {
       "month": "January",

@@ -36,7 +36,7 @@ Each month contains:
 - attention = attention
 
 ## 6. Shell references
-The page shell does not use arbitrary neutrals.
+The app shell does not use arbitrary neutrals.
 
 It uses defined reference sets:
 
@@ -49,3 +49,10 @@ It uses defined reference sets:
 - paper
 - ink
 - quietInk
+
+## 7. Implementation target
+The system must expose 26 directly addressable theme codes for apps:
+- `shellDay`
+- `shellNight`
+- `januaryDay ... decemberDay`
+- `januaryNight ... decemberNight`
