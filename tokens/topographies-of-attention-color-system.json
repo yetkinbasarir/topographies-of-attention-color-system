@@ -1,0 +1,154 @@
+{
+  "meta": {
+    "name": "Topographies of Attention Color System",
+    "shortName": "t-of-a",
+    "version": "v1",
+    "sourceOfTruth": "tokens/topographies-of-attention-color-system.json",
+    "referenceHTML": "reference/t-of-a-day-night-system-v11.html"
+  },
+  "principles": {
+    "colorsNeverChangeBetweenDayAndNight": true,
+    "nightModeUsesRoleReassignmentOnly": true,
+    "topographyIsPrimaryMonthlyReference": true,
+    "lineIsAlwaysAttention": true,
+    "shellUsesReferenceSetsOnly": true
+  },
+  "shell": {
+    "day": {
+      "paper": "#F1F4F8",
+      "ink": "#202A38",
+      "quietInk": "#6A7384"
+    },
+    "night": {
+      "paper": "#EEE8E3",
+      "ink": "#23201E",
+      "quietInk": "#8F8680"
+    }
+  },
+  "roleMappings": {
+    "day": {
+      "background": "topography",
+      "primaryText": "darkInk",
+      "secondaryText": "midInk",
+      "line": "attention",
+      "attention": "attention"
+    },
+    "night": {
+      "background": "darkInk",
+      "primaryText": "topography",
+      "secondaryText": "midInk",
+      "line": "attention",
+      "attention": "attention"
+    }
+  },
+  "months": {
+    "january": {
+      "month": "January",
+      "attentionName": "Signal Blue",
+      "attentionKey": "signal_blue",
+      "topography": "#CCDFFF",
+      "darkInk": "#233246",
+      "midInk": "#5A6F86",
+      "attention": "#5457E8"
+    },
+    "february": {
+      "month": "February",
+      "attentionName": "Air Blue",
+      "attentionKey": "air_blue",
+      "topography": "#BAE4FA",
+      "darkInk": "#1F3845",
+      "midInk": "#597B8C",
+      "attention": "#0072E7"
+    },
+    "march": {
+      "month": "March",
+      "attentionName": "Tide Teal",
+      "attentionKey": "tide_teal",
+      "topography": "#B3E7EE",
+      "darkInk": "#203D3F",
+      "midInk": "#5B7C7D",
+      "attention": "#0D828E"
+    },
+    "april": {
+      "month": "April",
+      "attentionName": "Sprout Green",
+      "attentionKey": "sprout_green",
+      "topography": "#C6E6CD",
+      "darkInk": "#24392E",
+      "midInk": "#5E7A67",
+      "attention": "#27864E"
+    },
+    "may": {
+      "month": "May",
+      "attentionName": "Leaf Lime",
+      "attentionKey": "leaf_lime",
+      "topography": "#D9E2C1",
+      "darkInk": "#3D402A",
+      "midInk": "#787B58",
+      "attention": "#637F18"
+    },
+    "june": {
+      "month": "June",
+      "attentionName": "Pollen Gold",
+      "attentionKey": "pollen_gold",
+      "topography": "#EBDDBD",
+      "darkInk": "#4A3C24",
+      "midInk": "#8B7650",
+      "attention": "#956F16"
+    },
+    "july": {
+      "month": "July",
+      "attentionName": "Apricot Flame",
+      "attentionKey": "apricot_flame",
+      "topography": "#F0DBBE",
+      "darkInk": "#4A3627",
+      "midInk": "#8D6E56",
+      "attention": "#B95B17"
+    },
+    "august": {
+      "month": "August",
+      "attentionName": "Coral Pulse",
+      "attentionKey": "coral_pulse",
+      "topography": "#FDD6C5",
+      "darkInk": "#4A312D",
+      "midInk": "#8E6B63",
+      "attention": "#DD3423"
+    },
+    "september": {
+      "month": "September",
+      "attentionName": "Rose Signal",
+      "attentionKey": "rose_signal",
+      "topography": "#FFD4CE",
+      "darkInk": "#4D2F35",
+      "midInk": "#91656F",
+      "attention": "#D13E63"
+    },
+    "october": {
+      "month": "October",
+      "attentionName": "Berry Magenta",
+      "attentionKey": "berry_magenta",
+      "topography": "#FFD3DF",
+      "darkInk": "#4A2E3D",
+      "midInk": "#8A6678",
+      "attention": "#B84D9C"
+    },
+    "november": {
+      "month": "November",
+      "attentionName": "Violet Mark",
+      "attentionKey": "violet_mark",
+      "topography": "#F4D5EF",
+      "darkInk": "#402D4A",
+      "midInk": "#786285",
+      "attention": "#8561CB"
+    },
+    "december": {
+      "month": "December",
+      "attentionName": "Indigo Pulse",
+      "attentionKey": "indigo_pulse",
+      "topography": "#E1DAFB",
+      "darkInk": "#2F3251",
+      "midInk": "#696D95",
+      "attention": "#5869E5"
+    }
+  }
+}

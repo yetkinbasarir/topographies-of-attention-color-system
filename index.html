@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>t-of-a — Topographies of Attention Day / Night</title>
+  <style>
+    :root {
+      --line-thickness: 1px;
+      --card-radius: 22px;
+      --section-gap: 42px;
+      --day-paper: #F1F4F8;
+      --day-ink: #202A38;
+      --day-quiet: #6A7384;
+      --night-paper: #EEE8E3;
+      --night-ink: #23201E;
+      --night-quiet: #8F8680;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body[data-shell="day"] { --shell-paper: var(--day-paper); --shell-ink: var(--day-ink); --shell-quiet: var(--day-quiet); }
+    body[data-shell="night"] { --shell-paper: var(--night-paper); --shell-ink: var(--night-ink); --shell-quiet: var(--night-quiet); }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: var(--shell-paper); color: var(--shell-ink); line-height: 1.45; transition: background 160ms ease, color 160ms ease; }
+    .page { max-width: 1440px; margin: 0 auto; padding: 24px 24px 64px; background: var(--shell-paper); }
+    .shell-bar { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; margin-bottom: 20px; }
+    .switch-wrap { display: flex; align-items: center; gap: 12px; }
+    .switch-button { appearance: none; border: var(--line-thickness) solid var(--shell-ink); background: var(--shell-paper); color: var(--shell-ink); width: 68px; height: 36px; border-radius: 999px; padding: 0; position: relative; cursor: pointer; transition: background 160ms ease, border-color 160ms ease; }
+    .switch-thumb { position: absolute; top: 3px; left: 3px; width: 28px; height: 28px; border-radius: 999px; background: var(--shell-ink); transition: transform 160ms ease, background 160ms ease; }
+    body[data-shell="night"] .switch-thumb { transform: translateX(32px); }
+    .switch-label { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--shell-quiet); }
+    .brand-mark { width: 84px; height: 84px; color: var(--shell-ink); flex: 0 0 auto; }
+    .brand-mark svg { width: 100%; height: 100%; display: block; }
+    .brand-mark svg path { fill: currentColor; }
+    .main-intro { margin-bottom: var(--section-gap); padding-bottom: 18px; border-bottom: var(--line-thickness) solid var(--shell-ink); display: grid; gap: 8px; }
+    h1 { margin: 0; font-size: clamp(28px, 4vw, 56px); line-height: 1.02; font-weight: 650; letter-spacing: -0.03em; color: var(--shell-ink); }
+    h2 { margin: 0; font-size: clamp(24px, 3vw, 40px); line-height: 1.02; font-weight: 640; letter-spacing: -0.03em; }
+    h3 { margin: 18px 0 8px; font-size: 28px; line-height: 1.05; letter-spacing: -0.03em; font-weight: 620; }
+    .main-intro p, .mode-header p, .full-scale-label { color: var(--shell-quiet); }
+    p { margin: 0; font-size: 15px; }
+    .neutral-cards { display: grid; grid-template-columns: minmax(280px, 1fr); gap: 18px; margin-bottom: var(--section-gap); background: var(--shell-paper); }
+    .reference-card { border-radius: var(--card-radius); padding: 18px; display: grid; gap: 14px; min-height: 270px; background: var(--shell-paper); }
+    .reference-card[data-mode="night"] { display: none; }
+    body[data-shell="night"] .reference-card[data-mode="day"] { display: none; }
+    body[data-shell="night"] .reference-card[data-mode="night"] { display: grid; }
+    .reference-header { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+    .reference-title { margin: 0; font-size: 24px; line-height: 1.02; letter-spacing: -0.03em; font-weight: 630; color: var(--shell-ink); }
+    .reference-key { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--shell-quiet); white-space: nowrap; }
+    .reference-copy { display: grid; gap: 8px; }
+    .reference-hero { margin: 0; font-size: 20px; line-height: 1.05; letter-spacing: -0.03em; font-weight: 620; max-width: 12ch; color: var(--shell-ink); }
+    .reference-body { margin: 0; font-size: 14px; line-height: 1.32; max-width: 40ch; color: var(--shell-quiet); }
+    .reference-swatches { display: grid; gap: 0; }
+    .reference-swatch { display: grid; grid-template-columns: 52px 1fr; gap: 12px; align-items: center; padding: 10px 0; border-top: var(--line-thickness) solid var(--shell-ink); }
+    .reference-chip, .chip { width: 52px; height: 52px; border-radius: 14px; background-clip: padding-box; }
+    .reference-label, .label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.68; margin-bottom: 2px; }
+    .reference-label { color: var(--shell-quiet); }
+    .reference-value { font-size: 16px; line-height: 1.1; color: var(--shell-ink); }
+    .mode-section { margin-top: var(--section-gap); }
+    .mode-header { display: grid; grid-template-columns: 1.2fr 1fr; gap: 18px; align-items: end; margin-bottom: 28px; padding-bottom: 18px; border-bottom: var(--line-thickness) solid var(--shell-ink); }
+    .mode-title { color: var(--shell-ink); }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(260px, 1fr)); gap: 18px; }
+    .card { min-height: 560px; border-radius: var(--card-radius); padding: 18px; display: flex; flex-direction: column; justify-content: space-between; }
+    .card-header { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+    .month { font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; opacity: 0.82; }
+    .key { font-size: 12px; opacity: 0.72; white-space: nowrap; }
+    .top-block { margin-top: 10px; }
+    .sample { margin: 0 0 8px; font-size: 18px; line-height: 1.12; letter-spacing: -0.02em; }
+    .hero { font-size: 22px; line-height: 1.02; letter-spacing: -0.03em; font-weight: 620; text-wrap: balance; max-width: 11ch; }
+    .mid { font-size: 14px; max-width: 30ch; line-height: 1.3; }
+    .attention-proof { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-top: 18px; padding-top: 12px; border-top: var(--line-thickness) solid transparent; }
+    .attention-sample { min-height: 56px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 620; letter-spacing: -0.01em; }
+    .swatches { display: grid; gap: 0; margin-top: 18px; }
+    .swatch { display: grid; grid-template-columns: 52px 1fr; gap: 12px; align-items: center; padding: 10px 0; border-top: var(--line-thickness) solid transparent; }
+    .value { font-size: 16px; line-height: 1.1; }
+    .bottom-scale-wrap { margin-top: 18px; padding-top: 12px; border-top: var(--line-thickness) solid transparent; }
+    .bottom-scale { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; height: 28px; border-radius: 14px; overflow: hidden; }
+    .scale-step { height: 100%; }
+    .global-scales { margin-top: 42px; padding-top: 24px; border-top: var(--line-thickness) solid var(--shell-ink); display: grid; gap: 18px; }
+    .full-scale-section { display: grid; gap: 8px; }
+    .full-scale { display: grid; grid-template-columns: repeat(12, 1fr); height: 36px; border-radius: 18px; overflow: hidden; }
+    .full-scale-step { height: 100%; }
+    @media (max-width: 1080px) { .grid { grid-template-columns: repeat(2, minmax(260px, 1fr)); } .mode-header { grid-template-columns: 1fr; } }
+    @media (max-width: 680px) { .page { padding: 20px 16px 40px; } .shell-bar { align-items: center; } .brand-mark { width: 72px; height: 72px; } .grid { grid-template-columns: 1fr; } .card { min-height: 500px; } .value, .reference-value { font-size: 15px; } .full-scale { height: 30px; } }
+  </style>
+</head>
+<body data-shell="day">
+  <main class="page">
+    <section class="shell-bar">
+      <div class="switch-wrap">
+        <button class="switch-button" id="shellSwitch" type="button" role="switch" aria-checked="false" aria-label="Toggle Day and Night shell">
+          <span class="switch-thumb"></span>
+        </button>
+        <div class="switch-label" id="switchLabel">Day</div>
+      </div>
+      <div class="brand-mark" aria-label="t-of-a sign"><?xml version="1.0" encoding="UTF-8"?>
+<svg id="b" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
+  <g id="c" data-name="Layer 1">
+    <path d="M0,0v300h140.625v-85.121c-31.791-4.56-56.25-31.828-56.25-64.879,0-36.244,29.382-65.625,65.625-65.625s65.625,29.381,65.625,65.625c0,33.052-24.459,60.32-56.25,64.879v85.121h140.625V0H0Z"/>
+  </g>
+</svg></div>
+    </section>
+
+    <section class="main-intro">
+      <h1>Topographies of Attention — Day / Night</h1>
+      <p>The monthly color structure remains fixed across day and night. No colors are added, removed, lightened, or darkened. Night mode is built only by reassigning roles inside the same monthly set.</p>
+    </section>
+
+    <section class="neutral-cards">
+      <section class="reference-card" data-mode="day">
+        <div class="reference-header"><h2 class="reference-title">Day Reference</h2><div class="reference-key">cold set</div></div>
+        <div class="reference-copy"><p class="reference-hero">Paper, Ink, Quiet Ink</p><p class="reference-body">A cooler editorial neutral set for day reading on screen. Paper avoids pure white, Ink avoids absolute black, and Quiet Ink stays related to both.</p></div>
+        <div class="reference-swatches">
+          <div class="reference-swatch"><div class="reference-chip" style="background:var(--day-paper)"></div><div><div class="reference-label">Paper</div><div class="reference-value">#F1F4F8</div></div></div>
+          <div class="reference-swatch"><div class="reference-chip" style="background:var(--day-ink)"></div><div><div class="reference-label">Ink</div><div class="reference-value">#202A38</div></div></div>
+          <div class="reference-swatch"><div class="reference-chip" style="background:var(--day-quiet)"></div><div><div class="reference-label">Quiet Ink</div><div class="reference-value">#6A7384</div></div></div>
+        </div>
+      </section>
+      <section class="reference-card" data-mode="night">
+        <div class="reference-header"><h2 class="reference-title">Night Reference</h2><div class="reference-key">warm set</div></div>
+        <div class="reference-copy"><p class="reference-hero">Paper, Ink, Quiet Ink</p><p class="reference-body">A warmer night counterpart with lower saturation. Ink becomes the field, Paper becomes the light reading tone, and Quiet Ink stays quiet enough not to compete with the seasonal colors.</p></div>
+        <div class="reference-swatches">
+          <div class="reference-swatch"><div class="reference-chip" style="background:var(--night-paper)"></div><div><div class="reference-label">Paper</div><div class="reference-value">#EEE8E3</div></div></div>
+          <div class="reference-swatch"><div class="reference-chip" style="background:var(--night-ink)"></div><div><div class="reference-label">Ink</div><div class="reference-value">#23201E</div></div></div>
+          <div class="reference-swatch"><div class="reference-chip" style="background:var(--night-quiet)"></div><div><div class="reference-label">Quiet Ink</div><div class="reference-value">#8F8680</div></div></div>
+        </div>
+      </section>
+    </section>
+
+    <section class="mode-section">
+      <div class="mode-header">
+        <h2 class="mode-title">Topographies of Attention Day</h2>
+        <p>Day mode starts from topography as the field. Dark Ink carries the main text, Mid Ink carries the softer voice, and Attention activates the system.</p>
+      </div>
+      <section class="grid">
+<section class="card" style="background:#CCDFFF">
+  <div class="card-header"><div class="month">January</div><div class="key">signal_blue</div></div>
+  <div class="top-block">
+    <p class="sample hero" style="color:#FFFFFF">Topographies of Attention</p>
+    <h3 class="card-title" style="color:#5457E8">Signal Blue</h3>
+    <p class="sample mid" style="color:#5A6F86">Day mode. Topography holds the field. Attention activates it.</p>
+  </div>
+  <div class="attention-proof" style="border-color:#5457E8">
+    <div class="attention-sample" style="background:#5457E8; color:#FFFFFF"><span>White</span></div>
+    <div class="attention-sample" style="background:#5457E8; color:#111111"><span>Black</span></div>
+  </div>
+  <div class="swatches">
+    <div class="swatch" style="border-color:#5457E8"><div class="chip" style="background:#CCDFFF"></div><div class="meta"><div class="label">Topography</div><div class="value">#CCDFFF</div></div></div>
+    <div class="swatch" style="border-color:#5457E8"><div class="chip" style="background:#233246"></div><div class="meta"><div class="label">Dark Ink</div><div class="value">#233246</div></div></div>
+    <div class="swatch" style="border-color:#5457E8"><div class="chip" style="background:#5A6F86"></div><div class="meta"><div class="label">Mid Ink</div><div class="value">#5A6F86</div></div></div>
+    <div class="swatch" style="border-color:#5457E8"><div class="chip" style="background:#5457E8"></div><div class="meta"><div class="label">Attention</div><div class="value">#5457E8</div></div></div>
+  </div>
+  <div class="bottom-scale-wrap" style="border-color:#5457E8"><div class="bottom-scale"><div class="scale-step" style="background:#233246"></div><div class="scale-step" style="background:#5A6F86"></div><div class="scale-step" style="background:#CCDFFF"></div><div class="scale-step" style="background:#5457E8"></div></div></div>
+</section>
+<section class="card" style="background:#BAE4FA">
+  <div class="card-header"><div class="month">February</div><div class="key">air_blue</div></div>
+  <div class="top-block">
+    <p class="sample hero" style="color:#FFFFFF">Topographies of Attention</p>
+    <h3 class="card-title" style="color:#0072E7">Air Blue</h3>
+    <p class="sample mid" style="color:#597B8C">Day mode. Topography holds the field. Attention activates it.</p>
+  </div>
+  <div class="attention-proof" style="border-color:#0072E7">
+    <div class="attention-sample" style="background:#0072E7; color:#FFFFFF"><span>White</span></div>
+    <div class="attention-sample" style="background:#0072E7; color:#111111"><span>Black</span></div>
+  </div>
+  <div class="swatches">
+    <div class="swatch" style="border-color:#0072E7"><div class="chip" style="background:#BAE4FA"></div><div class="meta"><div class="label">Topography</div><div class="value">#BAE4FA</div></div></div>
+    <div class="swatch" style="border-color:#0072E7"><div class="chip" style="background:#1F3845"></div><div class="meta"><div class="label">Dark Ink</div><div class="value">#1F3845</div></div></div>
+    <div class="swatch" style="border-color:#0072E7"><div class="chip" style="background:#597B8C"></div><div class="meta"><div class="label">Mid Ink</div><div class="value">#597B8C</div></div></div>
+    <div class="swatch" style="border-color:#0072E7"><div class="chip" style="background:#0072E7"></div><div class="meta"><div class="label">Attention</div><div class="value">#0072E7</div></div></div>
+  </div>
+  <div class="bottom-scale-wrap" style="border-color:#0072E7"><div class="bottom-scale"><div class="scale-step" style="background:#1F3845"></div><div class="scale-step" style="background:#597B8C"></div><div class="scale-step" style="background:#BAE4FA"></div><div class="scale-step" style="background:#0072E7"></div></div></div>
+</section>
+<section class="card" style="background:#B3E7EE">
+  <div class="card-header"><div class="month">March</div><div class="key">tide_teal</div></div>
+  <div class="top-block">
+    <p class="sample hero" style="color:#FFFFFF">Topographies of Attention</p>
+    <h3 class="card-title" style="color:#0D828E">Tide Teal</h3>
+    <p class="sample mid" style="color:#5B7C7D">Day mode. Topography holds the field. Attention activates it.</p>
+  </div>
+  <div class="attention-proof" style="border-color:#0D828E">
+    <div class="attention-sample" style="background:#0D828E; color:#FFFFFF"><span>White</span></div>
+    <div class="attention-sample" style="background:#0D828E; color:#111111"><span>Black</span></div>
+  </div>
+  <div class="swatches">
+    <div class="swatch" style="border-color:#0D828E"><div class="chip" style="background:#B3E7EE"></div><div class="meta"><div class="label">Topography</div><div class="value">#B3E7EE</div></div></div>
+    <div class="swatch" style="border-color:#0D828E"><div class="chip" style="background:#203D3F"></div><div class="meta"><div class="label">Dark Ink</div><div class="value">#203D3F</div></div></div>
+    <div class="swatch" style="border-color:#0D828E"><div class="chip" style="background:#5B7C7D"></div><div class="meta"><div class="label">Mid Ink</div><div class="value">#5B7C7D</div></div></div>
+    <div class="swatch" style="border-color:#0D828E"><div class="chip" style="background:#0D828E"></div><div class="meta"><div class="label">Attention</div><div class="value">#0D828E</div></div></div>
+  </div>
+  <div class="bottom-scale-wrap" style="border-color:#0D828E"><div class="bottom-scale"><div class="scale-step" style="background:#203D3F"></div><div class="scale-step" style="background:#5B7C7D"></div><div class="scale-step" style="background:#B3E7EE"></div><div class="scale-step" style="background:#0D828E"></div></div></div>
+</section>
+<section class="card" style="background:#C6E6CD">
+  <div class="card-header"><div class="month">April</div><div class="key">sprout_green</div></div>
+  <div class="top-block">
+    <p class="sample hero" style="color:#FFFFFF">Topographies of Attention</p>
+    <h3 class="card-title" style="color:#27864E">Sprout Green</h3>
+    <p class="sample mid" style="color:#5E7A67">Day mode. Topography holds the field. Attention activates it.</p>
+  </div>
+  <div class="attention-proof" style="border-color:#27864E">
+    <div class="attention-sample" style="background:#27864E; color:#FFFFFF"><span>White</span></div>
+    <div class="attention-sample" style="background:#27864E; color:#111111"><span>Black</span></div>
+  </div>
+  <div class="swatches">
+    <div class="swatch" style="border-color:#27864E"><div class="chip" style="background:#C6E6CD"></div><div class="meta"><div class="label">Topography</div><div class="value">#C6E6CD</div></div></div>
+    <div class="swatch" style="border-color:#27864E"><div class="chip" style="background:#24392E"></div><div class="meta"><div class="label">Dark Ink</div><div class="value">#24392E</div></div></div>
+    <div class="swatch" style="border-color:#27864E"><div class="chip" style="background:#5E7A67"></div><div class="meta"><div class="label">Mid Ink</div><div class="value">#5E7A67</div></div></div>
+    <div class="swatch" style="border-color:#27864E"><div class="chip" style="background:#27864E"></div><div class="meta"><div class="label">Attention</div><div class="value">#27864E</div></div></div>
+  </div>
+  <div class="bottom-scale-wrap" style="border-color:#27864E"><div class="bottom-scale"><div class="scale-step" style="background:#24392E"></div><div class="scale-step" style="background:#5E7A67"></div><div class="scale-step" style="background:#C6E6CD"></div><div class="scale-step" style="background:#27864E"></div></div></div>
+</section>
+<section class="card" style="background:#D9E2C1">
+  <div class="card-header"><div class="month">May</div><div class="key">leaf_lime</div></div>
+  <div class="top-block">
+    <p class="sample hero" style="color:#FFFFFF">Topographies of Attention</p>
+    <h3 class="card-title" style="color:#637F18">Leaf Lime</h3>
+    <p class="sample mid" style="color:#787B58">Day mode. Topography holds the field. Attention activates it.</p>
+  </div>
+  <div class="attention-proof" style="border-color:#637F18">
+    <div class="attention-sample" style="background:#637F18; color:#FFFFFF"><span>White</span></div>
+    <div class="attention-sample" style="background:#637F18; color:#111111"><span>Black</span></div>
+  </div>
+  <div class="swatches">
+    <div class="swatch" style="border-color:#637F18"><div class="chip" style="background:#D9E2C1"></div><div class="meta"><div class="label">Topography</div><div class="value">#D9E2C1</div></div></div>
+    <div class="swatch" style="border-color:#637F18"><div class="chip" style="background:#3D402A"></div><div class="meta"><div class="label">Dark Ink</div><div class="value">#3D402A</div></div></div>
+    <div class="swatch" style="border-color:#637F18"><div class="chip" style="background:#787B58"></div><div class="meta"><div class="label">Mid Ink</div><div class="value">#787B58</div></div></div>
+    <div class="swatch" style="border-color:#637F18"><div class="chip" style="background:#637F18"></div><div class="meta"><div class="label">Attention</div><div class="value">#637F18</div></div></div>
+  </div>
+  <div class="bottom-scale-wrap" style="border-color:#637F18"><div class="bottom-scale"><div class="scale-step" style="background:#3D402A"></div><div class="scale-step" style="background:#787B58"></div><div class="scale-step" style="background:#D9E2C1"></div><div class="scale-step" style="background:#637F18"></div></div></div>
+</section>
+<section class="card" style="background:#EBDDBD">
+  <div class="card-header"><div class="month">June</div><div class="key">pollen_gold</div></div>
+  <div class="top-block">
+    <p class="sample hero" style="color:#FFFFFF">Topographies of Attention</p>
+    <h3 class="card-title" style="color:#956F16">Pollen Gold</h3>
+    <p class="sample mid" style="color:#8B7650">Day mode. Topography holds the field. Attention activates it.</p>
+  </div>
+  <div class="attention-proof" style="border-color:#956F16">
+    <div class="attention-sample" style="background:#956F16; color:#FFFFFF"><span>White</span></div>
+    <div class="attention-sample" style="background:#956F16; color:#111111"><span>Black</span></div>
+  </div>
+  <div class="swatches">
+    <div class="swatch" style="border-color:#956F16"><div class="chip" style="background:#EBDDBD"></div><div class="meta"><div class="label">Topography</div><div class="value">#EBDDBD</div></div></div>
+    <div class="swatch" style="border-color:#956F16"><div class="chip" style="background:#4A3C24"></div><div class="meta"><div class="label">Dark Ink</div><div class="value">#4A3C24</div></div></div>
+    <div class="swatch" style="border-color:#956F16"><div class="chip" style="background:#8B7650"></div><div class="meta"><div class="label">Mid Ink</div><div class="value">#8B7650</div></div></div>
+    <div class="swatch" style="border-color:#956F16"><div class="chip" style="background:#956F16"></div><div class="meta"><div class="label">Attention</div><div class="value">#956F16</div></div></div>
+  </div>
+  <div class="bottom-scale-wrap" style="border-color:#956F16"><div class="bottom-scale"><div class="scale-step" style="background:#4A3C24"></div><div class="scale-step" style="background:#8B7650"></div><div class="scale-step" style="background:#EBDDBD"></div><div class="scale-step" style="background:#956F16"></div></div></div>
+</section>
+<section class="card" style="background:#F0DBBE">
+  <div class="card-header"><div class="month">July</div><div class="key">apricot_flame</div></div>
+  <div class="top-block">
+    <p class="sample hero" style="color:#FFFFFF">Topographies of Attention</p>
+    <h3 class="card-title" style="color:#B95B17">Apricot Flame</h3>
+    <p class="sample mid" style="color:#8D6E56">Day mode. Topography holds the field. Attention activates it.</p>
+  </div>
+  <div class="attention-proof" style="border-color:#B95B17">
+    <div class="attention-sample" style="background:#B95B17; color:#FFFFFF"><span>White</span></div>
+    <div class="attention-sample" style="background:#B95B17; color:#111111"><span>Black</span></div>
+  </div>
+  <div class="swatches">
+    <div class="swatch" style="border-color:#B95B17"><div class="chip" style="background:#F0DBBE"></div><div class="meta"><div class="label">Topography</div><div class="value">#F0DBBE</div></div></div>
+    <div class="swatch" style="border-color:#B95B17"><div class="chip" style="background:#4A3627"></div><div class="meta"><div class="label">Dark Ink</div><div class="value">#4A3627</div></div></div>
+    <div class="swatch" style="border-color:#B95B17"><div class="chip" style="background:#8D6E56"></div><div class="meta"><div class="label">Mid Ink</div><div class="value">#8D6E56</div></div></div>
+    <div class="swatch" style="border-color:#B95B17"><div class="chip" style="background:#B95B17"></div><div class="meta"><div class="label">Attention</div><div class="value">#B95B17</div></div></div>
+  </div>
+  <div class="bottom-scale-wrap" style="border-color:#B95B17"><div class="bottom-scale"><div class="scale-step" style="background:#4A3627"></div><div class="scale-step" style="background:#8D6E56"></div><div class="scale-step" style="background:#F0DBBE"></div><div class="scale-step" style="background:#B95B17"></div></div></div>
+</section>
+<section class="card" style="background:#FDD6C5">
+  <div class="card-header"><div class="month">August</div><div class="key">coral_pulse</div></div>
+  <div class="top-block">
+    <p class="sample hero" style="color:#FFFFFF">Topographies of Attention</p>
+    <h3 class="card-title" style="color:#DD3423">Coral Pulse</h3>
+    <p class="sample mid" style="color:#8E6B63">Day mode. Topography holds the field. Attention activates it.</p>
+  </div>
+  <div class="attention-proof" style="border-color:#DD3423">
+    <div class="attention-sample" style="background:#DD3423; color:#FFFFFF"><span>White</span></div>
+    <div class="attention-sample" style="background:#DD3423; color:#111111"><span>Black</span></div>
+  </div>
+  <div class="swatches">
+    <div class="swatch" style="border-color:#DD3423"><div class="chip" style="background:#FDD6C5"></div><div class="meta"><div class="label">Topography</div><div class="value">#FDD6C5</div></div></div>
+    <div class="swatch" style="border-color:#DD3423"><div class="chip" style="background:#4A312D"></div><div class="meta"><div class="label">Dark Ink</div><div class="value">#4A312D</div></div></div>
+    <div class="swatch" style="border-color:#DD3423"><div class="chip" style="background:#8E6B63"></div><div class="meta"><div class="label">Mid Ink</div><div class="value">#8E6B63</div></div></div>
+    <div class="swatch" style="border-color:#DD3423"><div class="chip" style="background:#DD3423"></div><div class="meta"><div class="label">Attention</div><div class="value">#DD3423</div></div></div>
+  </div>
+  <div class="bottom-scale-wrap" style="border-color:#DD3423"><div class="bottom-scale"><div class="scale-step" style="background:#4A312D"></div><div class="scale-step" style="background:#8E6B63"></div><div class="scale-step" style="background:#FDD6C5"></div><div class="scale-step" style="background:#DD3423"></div></div></div>
+</section>
+<section class="card" style="background:#FFD4CE">
+  <div class="card-header"><div class="month">September</div><div class="key">rose_signal</div></div>
+  <div class="top-block">
+    <p class="sample hero" style="color:#FFFFFF">Topographies of Attention</p>
+    <h3 class="card-title" style="color:#D13E63">Rose Signal</h3>
+    <p class="sample mid" style="color:#91656F">Day mode. Topography holds the field. Attention activates it.</p>
+  </div>
+  <div class="attention-proof" style="border-color:#D13E63">
+    <div class="attention-sample" style="background:#D13E63; color:#FFFFFF"><span>White</span></div>
+    <div class="attention-sample" style="background:#D13E63; color:#111111"><span>Black</span></div>
+  </div>
+  <div class="swatches">
+    <div class="swatch" style="border-color:#D13E63"><div class="chip" style="background:#FFD4CE"></div><div class="meta"><div class="label">Topography</div><div class="value">#FFD4CE</div></div></div>
+    <div class="swatch" style="border-color:#D13E63"><div class="chip" style="background:#4D2F35"></div><div class="meta"><div class="label">Dark Ink</div><div class="value">#4D2F35</div></div></div>
+    <div class="swatch" style="border-color:#D13E63"><div class="chip" style="background:#91656F"></div><div class="meta"><div class="label">Mid Ink</div><div class="value">#91656F</div></div></div>
+    <div class="swatch" style="border-color:#D13E63"><div class="chip" style="background:#D13E63"></div><div class="meta"><div class="label">Attention</div><div class="value">#D13E63</div></div></div>
+  </div>
+  <div class="bottom-scale-wrap" style="border-color:#D13E63"><div class="bottom-scale"><div class="scale-step" style="background:#4D2F35"></div><div class="scale-step" style="background:#91656F"></div><div class="scale-step" style="background:#FFD4CE"></div><div class="scale-step" style="background:#D13E63"></div></div></div>
+</section>
+<section class="card" style="background:#FFD3DF">
+  <div class="card-header"><div class="month">October</div><div class="key">berry_magenta</div></div>
+  <div class="top-block">
+    <p class="sample hero" style="color:#FFFFFF">Topographies of Attention</p>
+    <h3 class="card-title" style="color:#B84D9C">Berry Magenta</h3>
+    <p class="sample mid" style="color:#8A6678">Day mode. Topography holds the field. Attention activates it.</p>
+  </div>
+  <div class="attention-proof" style="border-color:#B84D9C">
+    <div class="attention-sample" style="background:#B84D9C; color:#FFFFFF"><span>White</span></div>
+    <div class="attention-sample" style="background:#B84D9C; color:#111111"><span>Black</span></div>
+  </div>
+  <div class="swatches">
+    <div class="swatch" style="border-color:#B84D9C"><div class="chip" style="background:#FFD3DF"></div><div class="meta"><div class="label">Topography</div><div class="value">#FFD3DF</div></div></div>
+    <div class="swatch" style="border-color:#B84D9C"><div class="chip" style="background:#4A2E3D"></div><div class="meta"><div class="label">Dark Ink</div><div class="value">#4A2E3D</div></div></div>
+    <div class="swatch" style="border-color:#B84D9C"><div class="chip" style="background:#8A6678"></div><div class="meta"><div class="label">Mid Ink</div><div class="value">#8A6678</div></div></div>
+    <div class="swatch" style="border-color:#B84D9C"><div class="chip" style="background:#B84D9C"></div><div class="meta"><div class="label">Attention</div><div class="value">#B84D9C</div></div></div>
+  </div>
+  <div class="bottom-scale-wrap" style="border-color:#B84D9C"><div class="bottom-scale"><div class="scale-step" style="background:#4A2E3D"></div><div class="scale-step" style="background:#8A6678"></div><div class="scale-step" style="background:#FFD3DF"></div><div class="scale-step" style="background:#B84D9C"></div></div></div>
+</section>
+<section class="card" style="background:#F4D5EF">
+  <div class="card-header"><div class="month">November</div><div class="key">violet_mark</div></div>
+  <div class="top-block">
+    <p class="sample hero" style="color:#FFFFFF">Topographies of Attention</p>
+    <h3 class="card-title" style="color:#8561CB">Violet Mark</h3>
+    <p class="sample mid" style="color:#786285">Day mode. Topography holds the field. Attention activates it.</p>
+  </div>
+  <div class="attention-proof" style="border-color:#8561CB">
+    <div class="attention-sample" style="background:#8561CB; color:#FFFFFF"><span>White</span></div>
+    <div class="attention-sample" style="background:#8561CB; color:#111111"><span>Black</span></div>
+  </div>
+  <div class="swatches">
+    <div class="swatch" style="border-color:#8561CB"><div class="chip" style="background:#F4D5EF"></div><div class="meta"><div class="label">Topography</div><div class="value">#F4D5EF</div></div></div>
+    <div class="swatch" style="border-color:#8561CB"><div class="chip" style="background:#402D4A"></div><div class="meta"><div class="label">Dark Ink</div><div class="value">#402D4A</div></div></div>
+    <div class="swatch" style="border-color:#8561CB"><div class="chip" style="background:#786285"></div><div class="meta"><div class="label">Mid Ink</div><div class="value">#786285</div></div></div>
+    <div class="swatch" style="border-color:#8561CB"><div class="chip" style="background:#8561CB"></div><div class="meta"><div class="label">Attention</div><div class="value">#8561CB</div></div></div>
+  </div>
+  <div class="bottom-scale-wrap" style="border-color:#8561CB"><div class="bottom-scale"><div class="scale-step" style="background:#402D4A"></div><div class="scale-step" style="background:#786285"></div><div class="scale-step" style="background:#F4D5EF"></div><div class="scale-step" style="background:#8561CB"></div></div></div>
+</section>
+<section class="card" style="background:#E1DAFB">
+  <div class="card-header"><div class="month">December</div><div class="key">indigo_pulse</div></div>
+  <div class="top-block">
+    <p class="sample hero" style="color:#FFFFFF">Topographies of Attention</p>
+    <h3 class="card-title" style="color:#5869E5">Indigo Pulse</h3>
+    <p class="sample mid" style="color:#696D95">Day mode. Topography holds the field. Attention activates it.</p>
+  </div>
+  <div class="attention-proof" style="border-color:#5869E5">
+    <div class="attention-sample" style="background:#5869E5; color:#FFFFFF"><span>White</span></div>
+    <div class="attention-sample" style="background:#5869E5; color:#111111"><span>Black</span></div>
+  </div>
+  <div class="swatches">
+    <div class="swatch" style="border-color:#5869E5"><div class="chip" style="background:#E1DAFB"></div><div class="meta"><div class="label">Topography</div><div class="value">#E1DAFB</div></div></div>
+    <div class="swatch" style="border-color:#5869E5"><div class="chip" style="background:#2F3251"></div><div class="meta"><div class="label">Dark Ink</div><div class="value">#2F3251</div></div></div>
+    <div class="swatch" style="border-color:#5869E5"><div class="chip" style="background:#696D95"></div><div class="meta"><div class="label">Mid Ink</div><div class="value">#696D95</div></div></div>
+    <div class="swatch" style="border-color:#5869E5"><div class="chip" style="background:#5869E5"></div><div class="meta"><div class="label">Attention</div><div class="value">#5869E5</div></div></div>
+  </div>
+  <div class="bottom-scale-wrap" style="border-color:#5869E5"><div class="bottom-scale"><div class="scale-step" style="background:#2F3251"></div><div class="scale-step" style="background:#696D95"></div><div class="scale-step" style="background:#E1DAFB"></div><div class="scale-step" style="background:#5869E5"></div></div></div>
+</section></section>
+      <section class="global-scales"><section class="full-scale-section"><div class="full-scale-label">All Attention colors</div><div class="full-scale"><div class="full-scale-step" style="background:#5457E8"></div><div class="full-scale-step" style="background:#0072E7"></div><div class="full-scale-step" style="background:#0D828E"></div><div class="full-scale-step" style="background:#27864E"></div><div class="full-scale-step" style="background:#637F18"></div><div class="full-scale-step" style="background:#956F16"></div><div class="full-scale-step" style="background:#B95B17"></div><div class="full-scale-step" style="background:#DD3423"></div><div class="full-scale-step" style="background:#D13E63"></div><div class="full-scale-step" style="background:#B84D9C"></div><div class="full-scale-step" style="background:#8561CB"></div><div class="full-scale-step" style="background:#5869E5"></div></div></section>
+<section class="full-scale-section"><div class="full-scale-label">All Dark Ink colors</div><div class="full-scale"><div class="full-scale-step" style="background:#233246"></div><div class="full-scale-step" style="background:#1F3845"></div><div class="full-scale-step" style="background:#203D3F"></div><div class="full-scale-step" style="background:#24392E"></div><div class="full-scale-step" style="background:#3D402A"></div><div class="full-scale-step" style="background:#4A3C24"></div><div class="full-scale-step" style="background:#4A3627"></div><div class="full-scale-step" style="background:#4A312D"></div><div class="full-scale-step" style="background:#4D2F35"></div><div class="full-scale-step" style="background:#4A2E3D"></div><div class="full-scale-step" style="background:#402D4A"></div><div class="full-scale-step" style="background:#2F3251"></div></div></section>
+<section class="full-scale-section"><div class="full-scale-label">All Mid Ink colors</div><div class="full-scale"><div class="full-scale-step" style="background:#5A6F86"></div><div class="full-scale-step" style="background:#597B8C"></div><div class="full-scale-step" style="background:#5B7C7D"></div><div class="full-scale-step" style="background:#5E7A67"></div><div class="full-scale-step" style="background:#787B58"></div><div class="full-scale-step" style="background:#8B7650"></div><div class="full-scale-step" style="background:#8D6E56"></div><div class="full-scale-step" style="background:#8E6B63"></div><div class="full-scale-step" style="background:#91656F"></div><div class="full-scale-step" style="background:#8A6678"></div><div class="full-scale-step" style="background:#786285"></div><div class="full-scale-step" style="background:#696D95"></div></div></section>
+<section class="full-scale-section"><div class="full-scale-label">All Topography colors</div><div class="full-scale"><div class="full-scale-step" style="background:#CCDFFF"></div><div class="full-scale-step" style="background:#BAE4FA"></div><div class="full-scale-step" style="background:#B3E7EE"></div><div class="full-scale-step" style="background:#C6E6CD"></div><div class="full-scale-step" style="background:#D9E2C1"></div><div class="full-scale-step" style="background:#EBDDBD"></div><div class="full-scale-step" style="background:#F0DBBE"></div><div class="full-scale-step" style="background:#FDD6C5"></div><div class="full-scale-step" style="background:#FFD4CE"></div><div class="full-scale-step" style="background:#FFD3DF"></div><div class="full-scale-step" style="background:#F4D5EF"></div><div class="full-scale-step" style="background:#E1DAFB"></div></div></section></section>
+    </section>
+
+    <section class="mode-section">
+      <div class="mode-header">
+        <h2 class="mode-title">Topographies of Attention Night</h2>
+        <p>Night mode keeps the same monthly colors. Dark Ink becomes the background, Topography replaces white as the lightest active tone, Mid Ink remains the softer voice, and Attention stays unchanged.</p>
+      </div>
+      <section class="grid">
+<section class="card night-card" style="background:#233246">
+  <div class="card-header"><div class="month" style="color:#CCDFFF">January</div><div class="key" style="color:#5A6F86">signal_blue</div></div>
+  <div class="top-block">
+    <p class="sample hero" style="color:#CCDFFF">Topographies of Attention</p>
+    <h3 class="card-title" style="color:#5457E8">Signal Blue</h3>
+    <p class="sample mid" style="color:#5A6F86">Night mode. No new colors. Roles are reassigned within the same monthly set.</p>
+  </div>
+  <div class="attention-proof" style="border-color:#5457E8">
+    <div class="attention-sample" style="background:#5457E8; color:#CCDFFF"><span>Topography</span></div>
+    <div class="attention-sample" style="background:#5457E8; color:#233246"><span>Dark Ink</span></div>
+  </div>
+  <div class="swatches">
+    <div class="swatch" style="border-color:#5457E8"><div class="chip" style="background:#233246"></div><div class="meta"><div class="label" style="color:#5A6F86">Background</div><div class="value" style="color:#CCDFFF">#233246</div></div></div>
+    <div class="swatch" style="border-color:#5457E8"><div class="chip" style="background:#CCDFFF"></div><div class="meta"><div class="label" style="color:#5A6F86">Topography</div><div class="value" style="color:#CCDFFF">#CCDFFF</div></div></div>
+    <div class="swatch" style="border-color:#5457E8"><div class="chip" style="background:#5A6F86"></div><div class="meta"><div class="label" style="color:#5A6F86">Mid Ink</div><div class="value" style="color:#CCDFFF">#5A6F86</div></div></div>
+    <div class="swatch" style="border-color:#5457E8"><div class="chip" style="background:#5457E8"></div><div class="meta"><div class="label" style="color:#5A6F86">Attention</div><div class="value" style="color:#CCDFFF">#5457E8</div></div></div>
+  </div>
+  <div class="bottom-scale-wrap" style="border-color:#5457E8"><div class="bottom-scale"><div class="scale-step" style="background:#233246"></div><div class="scale-step" style="background:#5A6F86"></div><div class="scale-step" style="background:#CCDFFF"></div><div class="scale-step" style="background:#5457E8"></div></div></div>
+</section>
+<section class="card night-card" style="background:#1F3845">
+  <div class="card-header"><div class="month" style="color:#BAE4FA">February</div><div class="key" style="color:#597B8C">air_blue</div></div>
+  <div class="top-block">
+    <p class="sample hero" style="color:#BAE4FA">Topographies of Attention</p>
+    <h3 class="card-title" style="color:#0072E7">Air Blue</h3>
+    <p class="sample mid" style="color:#597B8C">Night mode. No new colors. Roles are reassigned within the same monthly set.</p>
+  </div>
+  <div class="attention-proof" style="border-color:#0072E7">
+    <div class="attention-sample" style="background:#0072E7; color:#BAE4FA"><span>Topography</span></div>
+    <div class="attention-sample" style="background:#0072E7; color:#1F3845"><span>Dark Ink</span></div>
+  </div>
+  <div class="swatches">
+    <div class="swatch" style="border-color:#0072E7"><div class="chip" style="background:#1F3845"></div><div class="meta"><div class="label" style="color:#597B8C">Background</div><div class="value" style="color:#BAE4FA">#1F3845</div></div></div>
+    <div class="swatch" style="border-color:#0072E7"><div class="chip" style="background:#BAE4FA"></div><div class="meta"><div class="label" style="color:#597B8C">Topography</div><div class="value" style="color:#BAE4FA">#BAE4FA</div></div></div>
+    <div class="swatch" style="border-color:#0072E7"><div class="chip" style="background:#597B8C"></div><div class="meta"><div class="label" style="color:#597B8C">Mid Ink</div><div class="value" style="color:#BAE4FA">#597B8C</div></div></div>
+    <div class="swatch" style="border-color:#0072E7"><div class="chip" style="background:#0072E7"></div><div class="meta"><div class="label" style="color:#597B8C">Attention</div><div class="value" style="color:#BAE4FA">#0072E7</div></div></div>
+  </div>
+  <div class="bottom-scale-wrap" style="border-color:#0072E7"><div class="bottom-scale"><div class="scale-step" style="background:#1F3845"></div><div class="scale-step" style="background:#597B8C"></div><div class="scale-step" style="background:#BAE4FA"></div><div class="scale-step" style="background:#0072E7"></div></div></div>
+</section>
+<section class="card night-card" style="background:#203D3F">
+  <div class="card-header"><div class="month" style="color:#B3E7EE">March</div><div class="key" style="color:#5B7C7D">tide_teal</div></div>
+  <div class="top-block">
+    <p class="sample hero" style="color:#B3E7EE">Topographies of Attention</p>
+    <h3 class="card-title" style="color:#0D828E">Tide Teal</h3>
+    <p class="sample mid" style="color:#5B7C7D">Night mode. No new colors. Roles are reassigned within the same monthly set.</p>
+  </div>
+  <div class="attention-proof" style="border-color:#0D828E">
+    <div class="attention-sample" style="background:#0D828E; color:#B3E7EE"><span>Topography</span></div>
+    <div class="attention-sample" style="background:#0D828E; color:#203D3F"><span>Dark Ink</span></div>
+  </div>
+  <div class="swatches">
+    <div class="swatch" style="border-color:#0D828E"><div class="chip" style="background:#203D3F"></div><div class="meta"><div class="label" style="color:#5B7C7D">Background</div><div class="value" style="color:#B3E7EE">#203D3F</div></div></div>
+    <div class="swatch" style="border-color:#0D828E"><div class="chip" style="background:#B3E7EE"></div><div class="meta"><div class="label" style="color:#5B7C7D">Topography</div><div class="value" style="color:#B3E7EE">#B3E7EE</div></div></div>
+    <div class="swatch" style="border-color:#0D828E"><div class="chip" style="background:#5B7C7D"></div><div class="meta"><div class="label" style="color:#5B7C7D">Mid Ink</div><div class="value" style="color:#B3E7EE">#5B7C7D</div></div></div>
+    <div class="swatch" style="border-color:#0D828E"><div class="chip" style="background:#0D828E"></div><div class="meta"><div class="label" style="color:#5B7C7D">Attention</div><div class="value" style="color:#B3E7EE">#0D828E</div></div></div>
+  </div>
+  <div class="bottom-scale-wrap" style="border-color:#0D828E"><div class="bottom-scale"><div class="scale-step" style="background:#203D3F"></div><div class="scale-step" style="background:#5B7C7D"></div><div class="scale-step" style="background:#B3E7EE"></div><div class="scale-step" style="background:#0D828E"></div></div></div>
+</section>
+<section class="card night-card" style="background:#24392E">
+  <div class="card-header"><div class="month" style="color:#C6E6CD">April</div><div class="key" style="color:#5E7A67">sprout_green</div></div>
+  <div class="top-block">
+    <p class="sample hero" style="color:#C6E6CD">Topographies of Attention</p>
+    <h3 class="card-title" style="color:#27864E">Sprout Green</h3>
+    <p class="sample mid" style="color:#5E7A67">Night mode. No new colors. Roles are reassigned within the same monthly set.</p>
+  </div>
+  <div class="attention-proof" style="border-color:#27864E">
+    <div class="attention-sample" style="background:#27864E; color:#C6E6CD"><span>Topography</span></div>
+    <div class="attention-sample" style="background:#27864E; color:#24392E"><span>Dark Ink</span></div>
+  </div>
+  <div class="swatches">
+    <div class="swatch" style="border-color:#27864E"><div class="chip" style="background:#24392E"></div><div class="meta"><div class="label" style="color:#5E7A67">Background</div><div class="value" style="color:#C6E6CD">#24392E</div></div></div>
+    <div class="swatch" style="border-color:#27864E"><div class="chip" style="background:#C6E6CD"></div><div class="meta"><div class="label" style="color:#5E7A67">Topography</div><div class="value" style="color:#C6E6CD">#C6E6CD</div></div></div>
+    <div class="swatch" style="border-color:#27864E"><div class="chip" style="background:#5E7A67"></div><div class="meta"><div class="label" style="color:#5E7A67">Mid Ink</div><div class="value" style="color:#C6E6CD">#5E7A67</div></div></div>
+    <div class="swatch" style="border-color:#27864E"><div class="chip" style="background:#27864E"></div><div class="meta"><div class="label" style="color:#5E7A67">Attention</div><div class="value" style="color:#C6E6CD">#27864E</div></div></div>
+  </div>
+  <div class="bottom-scale-wrap" style="border-color:#27864E"><div class="bottom-scale"><div class="scale-step" style="background:#24392E"></div><div class="scale-step" style="background:#5E7A67"></div><div class="scale-step" style="background:#C6E6CD"></div><div class="scale-step" style="background:#27864E"></div></div></div>
+</section>
+<section class="card night-card" style="background:#3D402A">
+  <div class="card-header"><div class="month" style="color:#D9E2C1">May</div><div class="key" style="color:#787B58">leaf_lime</div></div>
+  <div class="top-block">
+    <p class="sample hero" style="color:#D9E2C1">Topographies of Attention</p>
+    <h3 class="card-title" style="color:#637F18">Leaf Lime</h3>
+    <p class="sample mid" style="color:#787B58">Night mode. No new colors. Roles are reassigned within the same monthly set.</p>
+  </div>
+  <div class="attention-proof" style="border-color:#637F18">
+    <div class="attention-sample" style="background:#637F18; color:#D9E2C1"><span>Topography</span></div>
+    <div class="attention-sample" style="background:#637F18; color:#3D402A"><span>Dark Ink</span></div>
+  </div>
+  <div class="swatches">
+    <div class="swatch" style="border-color:#637F18"><div class="chip" style="background:#3D402A"></div><div class="meta"><div class="label" style="color:#787B58">Background</div><div class="value" style="color:#D9E2C1">#3D402A</div></div></div>
+    <div class="swatch" style="border-color:#637F18"><div class="chip" style="background:#D9E2C1"></div><div class="meta"><div class="label" style="color:#787B58">Topography</div><div class="value" style="color:#D9E2C1">#D9E2C1</div></div></div>
+    <div class="swatch" style="border-color:#637F18"><div class="chip" style="background:#787B58"></div><div class="meta"><div class="label" style="color:#787B58">Mid Ink</div><div class="value" style="color:#D9E2C1">#787B58</div></div></div>
+    <div class="swatch" style="border-color:#637F18"><div class="chip" style="background:#637F18"></div><div class="meta"><div class="label" style="color:#787B58">Attention</div><div class="value" style="color:#D9E2C1">#637F18</div></div></div>
+  </div>
+  <div class="bottom-scale-wrap" style="border-color:#637F18"><div class="bottom-scale"><div class="scale-step" style="background:#3D402A"></div><div class="scale-step" style="background:#787B58"></div><div class="scale-step" style="background:#D9E2C1"></div><div class="scale-step" style="background:#637F18"></div></div></div>
+</section>
+<section class="card night-card" style="background:#4A3C24">
+  <div class="card-header"><div class="month" style="color:#EBDDBD">June</div><div class="key" style="color:#8B7650">pollen_gold</div></div>
+  <div class="top-block">
+    <p class="sample hero" style="color:#EBDDBD">Topographies of Attention</p>
+    <h3 class="card-title" style="color:#956F16">Pollen Gold</h3>
+    <p class="sample mid" style="color:#8B7650">Night mode. No new colors. Roles are reassigned within the same monthly set.</p>
+  </div>
+  <div class="attention-proof" style="border-color:#956F16">
+    <div class="attention-sample" style="background:#956F16; color:#EBDDBD"><span>Topography</span></div>
+    <div class="attention-sample" style="background:#956F16; color:#4A3C24"><span>Dark Ink</span></div>
+  </div>
+  <div class="swatches">
+    <div class="swatch" style="border-color:#956F16"><div class="chip" style="background:#4A3C24"></div><div class="meta"><div class="label" style="color:#8B7650">Background</div><div class="value" style="color:#EBDDBD">#4A3C24</div></div></div>
+    <div class="swatch" style="border-color:#956F16"><div class="chip" style="background:#EBDDBD"></div><div class="meta"><div class="label" style="color:#8B7650">Topography</div><div class="value" style="color:#EBDDBD">#EBDDBD</div></div></div>
+    <div class="swatch" style="border-color:#956F16"><div class="chip" style="background:#8B7650"></div><div class="meta"><div class="label" style="color:#8B7650">Mid Ink</div><div class="value" style="color:#EBDDBD">#8B7650</div></div></div>
+    <div class="swatch" style="border-color:#956F16"><div class="chip" style="background:#956F16"></div><div class="meta"><div class="label" style="color:#8B7650">Attention</div><div class="value" style="color:#EBDDBD">#956F16</div></div></div>
+  </div>
+  <div class="bottom-scale-wrap" style="border-color:#956F16"><div class="bottom-scale"><div class="scale-step" style="background:#4A3C24"></div><div class="scale-step" style="background:#8B7650"></div><div class="scale-step" style="background:#EBDDBD"></div><div class="scale-step" style="background:#956F16"></div></div></div>
+</section>
+<section class="card night-card" style="background:#4A3627">
+  <div class="card-header"><div class="month" style="color:#F0DBBE">July</div><div class="key" style="color:#8D6E56">apricot_flame</div></div>
+  <div class="top-block">
+    <p class="sample hero" style="color:#F0DBBE">Topographies of Attention</p>
+    <h3 class="card-title" style="color:#B95B17">Apricot Flame</h3>
+    <p class="sample mid" style="color:#8D6E56">Night mode. No new colors. Roles are reassigned within the same monthly set.</p>
+  </div>
+  <div class="attention-proof" style="border-color:#B95B17">
+    <div class="attention-sample" style="background:#B95B17; color:#F0DBBE"><span>Topography</span></div>
+    <div class="attention-sample" style="background:#B95B17; color:#4A3627"><span>Dark Ink</span></div>
+  </div>
+  <div class="swatches">
+    <div class="swatch" style="border-color:#B95B17"><div class="chip" style="background:#4A3627"></div><div class="meta"><div class="label" style="color:#8D6E56">Background</div><div class="value" style="color:#F0DBBE">#4A3627</div></div></div>
+    <div class="swatch" style="border-color:#B95B17"><div class="chip" style="background:#F0DBBE"></div><div class="meta"><div class="label" style="color:#8D6E56">Topography</div><div class="value" style="color:#F0DBBE">#F0DBBE</div></div></div>
+    <div class="swatch" style="border-color:#B95B17"><div class="chip" style="background:#8D6E56"></div><div class="meta"><div class="label" style="color:#8D6E56">Mid Ink</div><div class="value" style="color:#F0DBBE">#8D6E56</div></div></div>
+    <div class="swatch" style="border-color:#B95B17"><div class="chip" style="background:#B95B17"></div><div class="meta"><div class="label" style="color:#8D6E56">Attention</div><div class="value" style="color:#F0DBBE">#B95B17</div></div></div>
+  </div>
+  <div class="bottom-scale-wrap" style="border-color:#B95B17"><div class="bottom-scale"><div class="scale-step" style="background:#4A3627"></div><div class="scale-step" style="background:#8D6E56"></div><div class="scale-step" style="background:#F0DBBE"></div><div class="scale-step" style="background:#B95B17"></div></div></div>
+</section>
+<section class="card night-card" style="background:#4A312D">
+  <div class="card-header"><div class="month" style="color:#FDD6C5">August</div><div class="key" style="color:#8E6B63">coral_pulse</div></div>
+  <div class="top-block">
+    <p class="sample hero" style="color:#FDD6C5">Topographies of Attention</p>
+    <h3 class="card-title" style="color:#DD3423">Coral Pulse</h3>
+    <p class="sample mid" style="color:#8E6B63">Night mode. No new colors. Roles are reassigned within the same monthly set.</p>
+  </div>
+  <div class="attention-proof" style="border-color:#DD3423">
+    <div class="attention-sample" style="background:#DD3423; color:#FDD6C5"><span>Topography</span></div>
+    <div class="attention-sample" style="background:#DD3423; color:#4A312D"><span>Dark Ink</span></div>
+  </div>
+  <div class="swatches">
+    <div class="swatch" style="border-color:#DD3423"><div class="chip" style="background:#4A312D"></div><div class="meta"><div class="label" style="color:#8E6B63">Background</div><div class="value" style="color:#FDD6C5">#4A312D</div></div></div>
+    <div class="swatch" style="border-color:#DD3423"><div class="chip" style="background:#FDD6C5"></div><div class="meta"><div class="label" style="color:#8E6B63">Topography</div><div class="value" style="color:#FDD6C5">#FDD6C5</div></div></div>
+    <div class="swatch" style="border-color:#DD3423"><div class="chip" style="background:#8E6B63"></div><div class="meta"><div class="label" style="color:#8E6B63">Mid Ink</div><div class="value" style="color:#FDD6C5">#8E6B63</div></div></div>
+    <div class="swatch" style="border-color:#DD3423"><div class="chip" style="background:#DD3423"></div><div class="meta"><div class="label" style="color:#8E6B63">Attention</div><div class="value" style="color:#FDD6C5">#DD3423</div></div></div>
+  </div>
+  <div class="bottom-scale-wrap" style="border-color:#DD3423"><div class="bottom-scale"><div class="scale-step" style="background:#4A312D"></div><div class="scale-step" style="background:#8E6B63"></div><div class="scale-step" style="background:#FDD6C5"></div><div class="scale-step" style="background:#DD3423"></div></div></div>
+</section>
+<section class="card night-card" style="background:#4D2F35">
+  <div class="card-header"><div class="month" style="color:#FFD4CE">September</div><div class="key" style="color:#91656F">rose_signal</div></div>
+  <div class="top-block">
+    <p class="sample hero" style="color:#FFD4CE">Topographies of Attention</p>
+    <h3 class="card-title" style="color:#D13E63">Rose Signal</h3>
+    <p class="sample mid" style="color:#91656F">Night mode. No new colors. Roles are reassigned within the same monthly set.</p>
+  </div>
+  <div class="attention-proof" style="border-color:#D13E63">
+    <div class="attention-sample" style="background:#D13E63; color:#FFD4CE"><span>Topography</span></div>
+    <div class="attention-sample" style="background:#D13E63; color:#4D2F35"><span>Dark Ink</span></div>
+  </div>
+  <div class="swatches">
+    <div class="swatch" style="border-color:#D13E63"><div class="chip" style="background:#4D2F35"></div><div class="meta"><div class="label" style="color:#91656F">Background</div><div class="value" style="color:#FFD4CE">#4D2F35</div></div></div>
+    <div class="swatch" style="border-color:#D13E63"><div class="chip" style="background:#FFD4CE"></div><div class="meta"><div class="label" style="color:#91656F">Topography</div><div class="value" style="color:#FFD4CE">#FFD4CE</div></div></div>
+    <div class="swatch" style="border-color:#D13E63"><div class="chip" style="background:#91656F"></div><div class="meta"><div class="label" style="color:#91656F">Mid Ink</div><div class="value" style="color:#FFD4CE">#91656F</div></div></div>
+    <div class="swatch" style="border-color:#D13E63"><div class="chip" style="background:#D13E63"></div><div class="meta"><div class="label" style="color:#91656F">Attention</div><div class="value" style="color:#FFD4CE">#D13E63</div></div></div>
+  </div>
+  <div class="bottom-scale-wrap" style="border-color:#D13E63"><div class="bottom-scale"><div class="scale-step" style="background:#4D2F35"></div><div class="scale-step" style="background:#91656F"></div><div class="scale-step" style="background:#FFD4CE"></div><div class="scale-step" style="background:#D13E63"></div></div></div>
+</section>
+<section class="card night-card" style="background:#4A2E3D">
+  <div class="card-header"><div class="month" style="color:#FFD3DF">October</div><div class="key" style="color:#8A6678">berry_magenta</div></div>
+  <div class="top-block">
+    <p class="sample hero" style="color:#FFD3DF">Topographies of Attention</p>
+    <h3 class="card-title" style="color:#B84D9C">Berry Magenta</h3>
+    <p class="sample mid" style="color:#8A6678">Night mode. No new colors. Roles are reassigned within the same monthly set.</p>
+  </div>
+  <div class="attention-proof" style="border-color:#B84D9C">
+    <div class="attention-sample" style="background:#B84D9C; color:#FFD3DF"><span>Topography</span></div>
+    <div class="attention-sample" style="background:#B84D9C; color:#4A2E3D"><span>Dark Ink</span></div>
+  </div>
+  <div class="swatches">
+    <div class="swatch" style="border-color:#B84D9C"><div class="chip" style="background:#4A2E3D"></div><div class="meta"><div class="label" style="color:#8A6678">Background</div><div class="value" style="color:#FFD3DF">#4A2E3D</div></div></div>
+    <div class="swatch" style="border-color:#B84D9C"><div class="chip" style="background:#FFD3DF"></div><div class="meta"><div class="label" style="color:#8A6678">Topography</div><div class="value" style="color:#FFD3DF">#FFD3DF</div></div></div>
+    <div class="swatch" style="border-color:#B84D9C"><div class="chip" style="background:#8A6678"></div><div class="meta"><div class="label" style="color:#8A6678">Mid Ink</div><div class="value" style="color:#FFD3DF">#8A6678</div></div></div>
+    <div class="swatch" style="border-color:#B84D9C"><div class="chip" style="background:#B84D9C"></div><div class="meta"><div class="label" style="color:#8A6678">Attention</div><div class="value" style="color:#FFD3DF">#B84D9C</div></div></div>
+  </div>
+  <div class="bottom-scale-wrap" style="border-color:#B84D9C"><div class="bottom-scale"><div class="scale-step" style="background:#4A2E3D"></div><div class="scale-step" style="background:#8A6678"></div><div class="scale-step" style="background:#FFD3DF"></div><div class="scale-step" style="background:#B84D9C"></div></div></div>
+</section>
+<section class="card night-card" style="background:#402D4A">
+  <div class="card-header"><div class="month" style="color:#F4D5EF">November</div><div class="key" style="color:#786285">violet_mark</div></div>
+  <div class="top-block">
+    <p class="sample hero" style="color:#F4D5EF">Topographies of Attention</p>
+    <h3 class="card-title" style="color:#8561CB">Violet Mark</h3>
+    <p class="sample mid" style="color:#786285">Night mode. No new colors. Roles are reassigned within the same monthly set.</p>
+  </div>
+  <div class="attention-proof" style="border-color:#8561CB">
+    <div class="attention-sample" style="background:#8561CB; color:#F4D5EF"><span>Topography</span></div>
+    <div class="attention-sample" style="background:#8561CB; color:#402D4A"><span>Dark Ink</span></div>
+  </div>
+  <div class="swatches">
+    <div class="swatch" style="border-color:#8561CB"><div class="chip" style="background:#402D4A"></div><div class="meta"><div class="label" style="color:#786285">Background</div><div class="value" style="color:#F4D5EF">#402D4A</div></div></div>
+    <div class="swatch" style="border-color:#8561CB"><div class="chip" style="background:#F4D5EF"></div><div class="meta"><div class="label" style="color:#786285">Topography</div><div class="value" style="color:#F4D5EF">#F4D5EF</div></div></div>
+    <div class="swatch" style="border-color:#8561CB"><div class="chip" style="background:#786285"></div><div class="meta"><div class="label" style="color:#786285">Mid Ink</div><div class="value" style="color:#F4D5EF">#786285</div></div></div>
+    <div class="swatch" style="border-color:#8561CB"><div class="chip" style="background:#8561CB"></div><div class="meta"><div class="label" style="color:#786285">Attention</div><div class="value" style="color:#F4D5EF">#8561CB</div></div></div>
+  </div>
+  <div class="bottom-scale-wrap" style="border-color:#8561CB"><div class="bottom-scale"><div class="scale-step" style="background:#402D4A"></div><div class="scale-step" style="background:#786285"></div><div class="scale-step" style="background:#F4D5EF"></div><div class="scale-step" style="background:#8561CB"></div></div></div>
+</section>
+<section class="card night-card" style="background:#2F3251">
+  <div class="card-header"><div class="month" style="color:#E1DAFB">December</div><div class="key" style="color:#696D95">indigo_pulse</div></div>
+  <div class="top-block">
+    <p class="sample hero" style="color:#E1DAFB">Topographies of Attention</p>
+    <h3 class="card-title" style="color:#5869E5">Indigo Pulse</h3>
+    <p class="sample mid" style="color:#696D95">Night mode. No new colors. Roles are reassigned within the same monthly set.</p>
+  </div>
+  <div class="attention-proof" style="border-color:#5869E5">
+    <div class="attention-sample" style="background:#5869E5; color:#E1DAFB"><span>Topography</span></div>
+    <div class="attention-sample" style="background:#5869E5; color:#2F3251"><span>Dark Ink</span></div>
+  </div>
+  <div class="swatches">
+    <div class="swatch" style="border-color:#5869E5"><div class="chip" style="background:#2F3251"></div><div class="meta"><div class="label" style="color:#696D95">Background</div><div class="value" style="color:#E1DAFB">#2F3251</div></div></div>
+    <div class="swatch" style="border-color:#5869E5"><div class="chip" style="background:#E1DAFB"></div><div class="meta"><div class="label" style="color:#696D95">Topography</div><div class="value" style="color:#E1DAFB">#E1DAFB</div></div></div>
+    <div class="swatch" style="border-color:#5869E5"><div class="chip" style="background:#696D95"></div><div class="meta"><div class="label" style="color:#696D95">Mid Ink</div><div class="value" style="color:#E1DAFB">#696D95</div></div></div>
+    <div class="swatch" style="border-color:#5869E5"><div class="chip" style="background:#5869E5"></div><div class="meta"><div class="label" style="color:#696D95">Attention</div><div class="value" style="color:#E1DAFB">#5869E5</div></div></div>
+  </div>
+  <div class="bottom-scale-wrap" style="border-color:#5869E5"><div class="bottom-scale"><div class="scale-step" style="background:#2F3251"></div><div class="scale-step" style="background:#696D95"></div><div class="scale-step" style="background:#E1DAFB"></div><div class="scale-step" style="background:#5869E5"></div></div></div>
+</section></section>
+      <section class="global-scales"><section class="full-scale-section"><div class="full-scale-label">Night backgrounds (Dark Ink)</div><div class="full-scale"><div class="full-scale-step" style="background:#233246"></div><div class="full-scale-step" style="background:#1F3845"></div><div class="full-scale-step" style="background:#203D3F"></div><div class="full-scale-step" style="background:#24392E"></div><div class="full-scale-step" style="background:#3D402A"></div><div class="full-scale-step" style="background:#4A3C24"></div><div class="full-scale-step" style="background:#4A3627"></div><div class="full-scale-step" style="background:#4A312D"></div><div class="full-scale-step" style="background:#4D2F35"></div><div class="full-scale-step" style="background:#4A2E3D"></div><div class="full-scale-step" style="background:#402D4A"></div><div class="full-scale-step" style="background:#2F3251"></div></div></section>
+<section class="full-scale-section"><div class="full-scale-label">Night primary text (Topography)</div><div class="full-scale"><div class="full-scale-step" style="background:#CCDFFF"></div><div class="full-scale-step" style="background:#BAE4FA"></div><div class="full-scale-step" style="background:#B3E7EE"></div><div class="full-scale-step" style="background:#C6E6CD"></div><div class="full-scale-step" style="background:#D9E2C1"></div><div class="full-scale-step" style="background:#EBDDBD"></div><div class="full-scale-step" style="background:#F0DBBE"></div><div class="full-scale-step" style="background:#FDD6C5"></div><div class="full-scale-step" style="background:#FFD4CE"></div><div class="full-scale-step" style="background:#FFD3DF"></div><div class="full-scale-step" style="background:#F4D5EF"></div><div class="full-scale-step" style="background:#E1DAFB"></div></div></section>
+<section class="full-scale-section"><div class="full-scale-label">Night secondary text (Mid Ink)</div><div class="full-scale"><div class="full-scale-step" style="background:#5A6F86"></div><div class="full-scale-step" style="background:#597B8C"></div><div class="full-scale-step" style="background:#5B7C7D"></div><div class="full-scale-step" style="background:#5E7A67"></div><div class="full-scale-step" style="background:#787B58"></div><div class="full-scale-step" style="background:#8B7650"></div><div class="full-scale-step" style="background:#8D6E56"></div><div class="full-scale-step" style="background:#8E6B63"></div><div class="full-scale-step" style="background:#91656F"></div><div class="full-scale-step" style="background:#8A6678"></div><div class="full-scale-step" style="background:#786285"></div><div class="full-scale-step" style="background:#696D95"></div></div></section>
+<section class="full-scale-section"><div class="full-scale-label">Night attention colors</div><div class="full-scale"><div class="full-scale-step" style="background:#5457E8"></div><div class="full-scale-step" style="background:#0072E7"></div><div class="full-scale-step" style="background:#0D828E"></div><div class="full-scale-step" style="background:#27864E"></div><div class="full-scale-step" style="background:#637F18"></div><div class="full-scale-step" style="background:#956F16"></div><div class="full-scale-step" style="background:#B95B17"></div><div class="full-scale-step" style="background:#DD3423"></div><div class="full-scale-step" style="background:#D13E63"></div><div class="full-scale-step" style="background:#B84D9C"></div><div class="full-scale-step" style="background:#8561CB"></div><div class="full-scale-step" style="background:#5869E5"></div></div></section></section>
+    </section>
+  </main>
+  <script>
+    const body = document.body;
+    const button = document.getElementById('shellSwitch');
+    const label = document.getElementById('switchLabel');
+    function applyShell(mode) {
+      body.setAttribute('data-shell', mode);
+      const isNight = mode === 'night';
+      button.setAttribute('aria-checked', isNight ? 'true' : 'false');
+      label.textContent = isNight ? 'Night' : 'Day';
+    }
+    button.addEventListener('click', () => {
+      const next = body.getAttribute('data-shell') === 'day' ? 'night' : 'day';
+      applyShell(next);
+    });
+    applyShell('day');
+  </script>
+</body>
+</html>
